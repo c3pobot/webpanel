@@ -8,6 +8,7 @@ buildprodimage.sh
 buildtestimage.sh
 updategitdependency.sh
 Dockerfile
+Dockerfile.dev
 node_modules
 data
 cache
