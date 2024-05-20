@@ -39,7 +39,7 @@ export default function GetAllyRow ({ name, allyCode, type, handleEdit, pri, alt
       onClose: handleMenuClose
     }
     if(type) opt.array.push({
-      name: 'Unlink '+(type === 'google' ? 'Google':'Code'),
+      name: 'Unlink '+(type === 'google' ? 'Google':'EA Connect'),
       value: {method: 'editAllyCode', data: {method: 'removeAuth', allyCode: allyCode}, dialogMsg: 'Are you sure you want to remove '+(type === 'google'? 'Google':'Code')+' Auth for allyCode '+allyCode+ '?'}
     })
     opt.array.push({
@@ -48,7 +48,7 @@ export default function GetAllyRow ({ name, allyCode, type, handleEdit, pri, alt
 
     })
     opt.array.push({
-      name: 'Link Code Auth',
+      name: 'Link EA Connect Auth',
       value: {path: '/codeAuth', allyCode: allyCode, playerName: name}
     })
     return (
@@ -62,7 +62,7 @@ export default function GetAllyRow ({ name, allyCode, type, handleEdit, pri, alt
       <TableRow onClick={()=>setACMenuStatus(true)}>
         <TableCell ><Typography>{name}</Typography></TableCell>
         <TableCell><Typography>{allyCode}</Typography></TableCell>
-        <TableCell><Typography>{type ? (type === 'google' ? 'Google':(type === 'codeAuth' ? 'Code':'Guest')):'None'}</Typography></TableCell>
+        <TableCell><Typography>{type ? (type === 'google' ? 'Google':(type === 'codeAuth' ? 'EA Connect':'Guest')):'None'}</Typography></TableCell>
         <TableCell><Typography>{pri === allyCode ? 'Primary':alt === allyCode ? 'Alt':''}</Typography></TableCell>
       </TableRow>
     </TableBody>

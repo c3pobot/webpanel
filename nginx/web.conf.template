@@ -3,26 +3,17 @@ server {
   server_name $DOMAIN_NAME;
   client_max_body_size 100m;
   client_body_buffer_size 100m;
-  access_log  /dev/null;
+  access_log off;
   root /usr/share/nginx/html;
   index index.html index.htm;
   proxy_set_header Upgrade $http_upgrade;
   proxy_set_header Connection $http_connection;
-
+  set $api_host $API_SERVICE_URI;
   location /api {
-    proxy_pass $API_SERVICE_URI;
-  }
-  location /asset {
-    proxy_pass $ASSET_URI;
-  }
-  location /portrait {
-    proxy_pass $ASSET_URI;
+    proxy_pass $api_host;
   }
   location /socket.io {
-    proxy_pass $API_SERVICE_URI;
-  }
-  location /thumbnail {
-    proxy_pass $ASSET_URI;
+    proxy_pass $api_host;
   }
   location / {
     try_files $uri /index.html;

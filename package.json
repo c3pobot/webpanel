@@ -36,7 +36,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "build-test": "chmod a+x buildtestimage.sh && ./buildtestimage.sh c3pobot/webpanel",
-    "prod": "GENERATE_SOURCEMAP=false react-scripts build && chmod a+x buildprodimage.sh && ./buildprodimage.sh c3pobot/webpanel"
+    "prod": "chmod a+x buildprodimage.sh && ./buildprodimage.sh c3pobot/webpanel"
   },
   "eslintConfig": {
     "extends": [

@@ -25,6 +25,7 @@ export default function GoogleLink(){
   const [ allyCode, setAllyCode ] = useLocalStorage('allyCode', null);
   const [ allyCodes, setAllyCodes ] = useState([])
   const [ fetchStatus, setFetchStatus ] = useState(true)
+  const [ androidAccess, setAndroidAccess ] = useState(false)
   if(urlParms?.allyCode) setAllyCode(urlParms.allyCode)
   async function fetchData() {
     setFetchStatus(true)
@@ -40,7 +41,20 @@ export default function GoogleLink(){
     setAllyCode(obj.allyCode)
   }
   if(fetchStatus) return null
-  if(allyCode){
+  if(!androidAccess){
+    return (
+      <Container>
+        <Box textAlign="center" pt={5} pb={5}>
+        <Typography>Warning!!!</Typography>
+        <Typography>This only works if you can access your game account on Android.</Typography>
+        <Typography>Google Play is Android only, Apple/iOS will not work.</Typography>
+        <Typography>Click the button below to confirm you can access your game on an Android Device</Typography>
+        <Box textAlign="center" pt={2} pb={2}><Button variant="contained" onClick={()=>setAndroidAccess(true)}>Yes, android Access to the game is Possible</Button></Box>
+      </Box>
+      </Container>
+    )
+  }
+  if(androidAccess && allyCode){
     const playerName = localStorage.getItem('playerName')
     const googleAuthUrl = getAuthUrl()
     let stateParam = localStorage.getItem('googleStateParam')

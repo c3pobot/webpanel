@@ -6,7 +6,7 @@ import ApiRequest from 'components/apiRequest'
 import ButtonNav from 'components/buttonNav'
 import DB from 'components/db'
 
-export default function CheckCode({ opts = {}, allyCode, setCode, setEmail }){
+export default function CheckCode({ opts = {}, allyCode, setCode, setEmail, setPlayerName }){
   const { discordId } = opts;
   const [ tempCode, setTempCode ] = useState('')
   const [ sendStatus, setSendStatus ] = useState(false);
@@ -23,6 +23,7 @@ export default function CheckCode({ opts = {}, allyCode, setCode, setEmail }){
           await DB.set('allyCodes', tempAllyCodes)
         }
       }
+      if(res.playerName) setPlayerName(res.playerName)
     }
     if(res?.status) setCode(res.status)
     if(res?.status === 'nocache') setEmail(false)

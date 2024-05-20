@@ -11,6 +11,7 @@ import ShowError from './showError'
 export default function CodeAuth(opts = {}){
   const { discordId } = opts;
   const [ allyCode, setAllyCode ] = useLocalStorage('allyCode', null);
+  const [ playerName, setPlayerName ] = useState(null)
   const [ email, setEmail ] = useState(false)
   const [ code, setCode ] = useState(null)
   if(!discordId){
@@ -24,6 +25,6 @@ export default function CodeAuth(opts = {}){
   }
   if(!allyCode) return <SelectAllyCode opts={opts} setAllyCode={updateAllyCode} />
   if(!email) return <SetEmail opts={opts} allyCode={allyCode} setEmail={setEmail} code={code} setCode={setCode}/>
-  if(!code) return <SetCode opts={opts} allyCode={allyCode} setEmail={setEmail} setCode={setCode} />
-  return <ShowError code={code} setCode={setCode} setEmail={setEmail} />
+  if(!code) return <SetCode opts={opts} allyCode={allyCode} setEmail={setEmail} setCode={setCode} setPlayerName={setPlayerName}/>
+  return <ShowError code={code} setCode={setCode} setEmail={setEmail} allyCode={allyCode} playerName={playerName} />
 }
