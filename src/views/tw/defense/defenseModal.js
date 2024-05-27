@@ -1,6 +1,6 @@
 //React
 import React, { useEffect, useState } from 'react';
-import { Checkbox, Button, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography} from '@mui/material';
+import { Checkbox, Button, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from '@mui/material';
 import AutoTextField from 'components/squads/autoTextField'
 
 const style = {
@@ -21,9 +21,11 @@ export default function DefenseModal ({open, setOpen, opts={}, unitList = [], zo
   const [ zone, setZone ] = useState(zoneDetails)
   useEffect(()=>{
     updateUnitsNameKeys()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   useEffect(()=>{
     updateUnitsNameKeys()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unitList])
   function handleClearClick (){
     setOpen(false)

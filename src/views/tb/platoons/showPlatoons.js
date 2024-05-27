@@ -1,42 +1,23 @@
-import React, { Fragment, useState } from 'react'
-import { Grid, Table, TableBody, TableRow, TableCell, Typography } from '@mui/material';
-
+import React, { useState } from 'react'
+import { Table, TableBody } from '@mui/material';
 import DB from 'components/db'
 
+import AssignUnit from './assignUnit'
 import EditSquad from './editSquad'
 import EditPlatoon from './editPlatoon'
 import EditUnit from './editUnit'
-const conflictSx = {
-  bgcolor: 'white',
-  color: 'black'
-}
-const squadSx = {
-  bgcolor: 'gray'
-}
-const unitFilled = {
-  //bgcolor: '#00b3ff'
-  bgcolor: '#91d4ff'
-}
-const unitFilledText = {
-  color: 'black',
-  fontWeight: 'bolder'
-}
-const unitNotFilled = {
-  bgcolor: '#e90e0e'
+import ShowPlatoon from './showPlatoon'
 
-}
-const unitNotFilledText = {
-  color: 'white',
-  fontWeight: 'bolder'
-}
 export default function ShowPlatoons({ opts = {}, platoonMap = [], tbId, pDef = [], platoonIds = [], setPlatoonIds, tbDay, member = []}){
-  const { setSpinner } = opts;
+  const { setSpinner, setAlert } = opts;
   const [ openSquadEdit, setSquadEditOpen ] = useState(false)
   const [ editSquad, setEditSquad ] = useState(null)
   const [ openPlatoonEdit, setPlatoonEditOpen ] = useState(false)
   const [ editPlatoon, setEditPlatoon ] = useState(null)
   const [ openUnitEdit, setUnitEditOpen ] = useState(false)
   const [ editUnit, setEditUnit ] = useState(null)
+  const [ openUnitAssign, setUnitAssignOpen ] = useState(false)
+
   function updateSquad(data = {}){
     if(data?.platoonId && data.squad.num){
       setEditSquad(data)
@@ -162,40 +143,122 @@ export default function ShowPlatoons({ opts = {}, platoonMap = [], tbId, pDef = 
     }
     setSpinner(false)
   }
+  async function removeBonusPlatoon(id){
+    setSpinner(true)
+    setPlatoonEditOpen(false)
+    setEditPlatoon(false)
+    let tempPlatoonIds = JSON.parse(JSON.stringify(platoonIds.filter(x=>x.id !== id)))
+    await updatePlatoonDb('tbPlatoonIds-'+tbDay+'-'+tbId, tempPlatoonIds)
+    setPlatoonIds(tempPlatoonIds)
+    setSpinner(false)
+  }
+  function assignUnit(openModal){
+    if(!openModal) return
+    setUnitEditOpen(false)
+    setUnitAssignOpen(true)
+  }
+  async function removeAssigned(method, unit, platoon, squad){
+    if(!method) return
+    setSpinner(true)
+    let tempPlatoonIds = JSON.parse(JSON.stringify(platoonIds))
+    let pIndex = tempPlatoonIds?.findIndex(x=>x.id === platoon.id), sIndex, tempSquad
+    if(pIndex >= 0) sIndex = tempPlatoonIds[pIndex]?.squads?.findIndex(x=>x.num === squad.num)
+    if(sIndex >= 0) tempSquad = tempPlatoonIds[pIndex].squads[sIndex]
+    if(!tempSquad){
+      setSpinner(false)
+      return
+    }
+    for(let i in tempSquad.unitConfig){
+      if(method === 'all'){
+        tempSquad.unitConfig[i].players = []
+      }else{
+        if(tempSquad.unitConfig[i].baseId === unit?.baseId) tempSquad.unitConfig[i].players = tempSquad.unitConfig[i].players?.filter(x=>x !== unit.playerId) || []
+      }
+    }
+    tempPlatoonIds[pIndex].squads[sIndex] = tempSquad
+    await updatePlatoonDb('tbPlatoonIds-'+tbDay+'-'+tbId, tempPlatoonIds)
+    setPlatoonIds(tempPlatoonIds)
+    setSpinner(false)
+    if(method === 'all') setAlert({ type: 'success', msg: `all forced assignements for ${platoon.id} where removed`})
+    if(method === 'single') setAlert({ type: 'success', msg: `${unit?.player} was un-assigned ${unit?.nameKey} for squad ${squad.num} in ${platoon.id}`})
+
+  }
+  async function changeUnitAssign(method, playerId, data = {}){
+    if(!method) return
+    setSpinner(true)
+    setUnitAssignOpen(false)
+    if(playerId === 'initial'){
+      setEditUnit(null)
+      setSpinner(false)
+      return
+    }
+
+    let guildMember = member.find(x=>x.playerId === playerId)
+    if(!guildMember){
+      setEditUnit(null)
+      setSpinner(false)
+      return
+    }
+    let tempPlatoonIds = JSON.parse(JSON.stringify(platoonIds))
+
+    let pIndex = tempPlatoonIds?.findIndex(x=>x.id === editUnit.platoonId)
+    if(pIndex >= 0){
+      let playerUnitCount = tempPlatoonIds[pIndex]?.squads?.reduce((acc, s)=>
+        acc + s?.unitConfig?.reduce((uAcc, u)=> uAcc + +(u.players?.filter(p=>p === playerId).length || 0), 0)
+      , 0) || 0
+      if(method === 'add' && playerUnitCount >= 10){
+        setEditUnit(null)
+        setSpinner(false)
+        setAlert({type: 'error', msg: `${guildMember.name} already has ${playerUnitCount} units assigned for platoons in ${tempPlatoonIds[pIndex]?.id}`})
+        return
+      }
+      let unitAssigned = tempPlatoonIds?.reduce((acc, p)=>
+        acc + (p?.squads?.reduce((sAcc, s)=>
+          sAcc + +(s?.unitConfig?.filter(u=>u?.baseId === data.baseId && u?.players?.filter(y=>y === playerId).length).length || 0)
+        , 0) || 0)
+      , 0) || 0
+      if(method === 'add' && unitAssigned){
+        setEditUnit(null)
+        setSpinner(false)
+        setAlert({type: 'error', msg: `${guildMember.name} already has already been assigned ${data.nameKey} for round ${tbDay}`})
+        return
+      }
+      if(!tempPlatoonIds[pIndex].squads) tempPlatoonIds[pIndex].squads = []
+      let squad = { num: data.squadNum, unitConfig: []}, unit = { baseId: data.baseId, prefilled: 0, players: [] }
+      let sIndex = tempPlatoonIds[pIndex]?.squads?.findIndex(x=>x.num === data.squadNum)
+      if(sIndex >= 0) squad = tempPlatoonIds[pIndex].squads[sIndex]
+      if(!squad?.unitConfig) squad.unitConfig = []
+      let uIndex = squad?.unitConfig?.findIndex(x=>x.baseId === data.baseId)
+      if(uIndex >= 0) unit = squad.unitConfig[uIndex]
+      if(method === 'add') unit.players.push(playerId)
+      if(method === 'remove') unit.players = unit.players.filter(x=>x !== playerId)
+      if(uIndex >= 0){
+        squad.unitConfig[uIndex] = unit
+      }else{
+        squad.unitConfig.push(unit)
+      }
+      if(sIndex >= 0){
+        tempPlatoonIds[pIndex].squads[sIndex] = squad
+      }else{
+        tempPlatoonIds[pIndex].squads.push(squad)
+      }
+      await updatePlatoonDb('tbPlatoonIds-'+tbDay+'-'+tbId, tempPlatoonIds)
+      setPlatoonIds(tempPlatoonIds)
+      if(method === 'add') setAlert({ type: 'success', msg: `${guildMember.name} was assigned ${data.nameKey} for platoons in ${tempPlatoonIds[pIndex]?.id}`})
+      if(method === 'remove') setAlert({ type: 'success', msg: `${guildMember.name} was un-assigned ${data.nameKey} for platoons in ${tempPlatoonIds[pIndex]?.id}`})
+    }
+    setEditUnit(null)
+    setSpinner(false)
+  }
   if(platoonMap?.length === 0) return null
   return (
     <Table>
     <TableBody>
     {openSquadEdit && <EditSquad open={openSquadEdit} setOpen={setSquadEditOpen} data={editSquad} changeSquad={changeSquad}/>}
-    {openPlatoonEdit && <EditPlatoon open={openPlatoonEdit} setOpen={setPlatoonEditOpen} platoon={editPlatoon} pDef={pDef} changePlatoon={changePlatoon}/>}
-    {openUnitEdit && <EditUnit open={openUnitEdit} setOpen={setUnitEditOpen} data={editUnit} changeUnit={changeUnit} member={member}/>}
-    {platoonMap.map((platoon, pIndex)=>(
-      <Fragment key={pIndex}>
-      <TableRow><TableCell sx={conflictSx} onClick={()=>updatePlatoon(platoon)}><Typography>{platoon.id+' '+platoon.type+' '+platoon.nameKey+' ('+platoon.points?.toLocaleString()+'/'+platoon.totalPoints?.toLocaleString()+')'+(platoon.exclude ? ' Excluded':(platoon.prefilled ? ' Prefilled':''))}</Typography></TableCell></TableRow>
-      {platoon.squads.map((squad, sIndex)=>(
-        <Fragment key={sIndex}>
-          <TableRow><TableCell sx={squadSx} onClick={()=>updateSquad({platoonId: platoon.id, squad: squad})}>
-            <Typography>{platoon.type+' '+platoon.nameKey+' Squad '+squad.num+(platoon?.rarity ? ' '+platoon.rarity+'*':'')+(platoon?.relicTier > 3 ? ' R'+(platoon.relicTier - 2):'')+' ('+squad.points?.toLocaleString()+') '+(squad.exclude ? ' Excluded':(squad.prefilled ? ' Prefilled':''))}</Typography>
-          </TableCell></TableRow>
-          {squad?.units?.length > 0 &&
-            <TableRow><TableCell>
-            <Grid container spacing={1}>
-              {squad.units.map((unit, uIndex)=>(
-                <Grid item xs={12} md={4} key={uIndex} onClick={()=>updateUnit({platoonId: platoon.id, squad: squad, unit: unit})}>
-                  <Table>
-                    <TableBody>
-                      <TableRow><TableCell sx={unit.player ? unitFilled:unitNotFilled}><Typography sx={unit.player ? unitFilledText:unitNotFilledText}>{unit.nameKey+' - '+(unit.player ? unit.player:'NONE - ('+unit.available+'/'+(unit.count || 0)+')')}</Typography></TableCell></TableRow>
-                    </TableBody>
-                  </Table>
-                </Grid>
-              ))}
-            </Grid>
-            </TableCell></TableRow>
-          }
-        </Fragment>
-      ))}
-      </Fragment>
-    ))}
+    {openPlatoonEdit && <EditPlatoon open={openPlatoonEdit} setOpen={setPlatoonEditOpen} platoon={editPlatoon} pDef={pDef} changePlatoon={changePlatoon} removeBonusPlatoon={removeBonusPlatoon}/>}
+    {openUnitEdit && <EditUnit open={openUnitEdit} setOpen={setUnitEditOpen} data={editUnit} changeUnit={changeUnit} assignUnit={assignUnit} member={member}/>}
+    {openUnitAssign && <AssignUnit open={openUnitAssign} setOpen={setUnitAssignOpen} data={editUnit} changeUnitAssign={changeUnitAssign} member={member} />}
+    {platoonMap.map((platoon, index)=>(<ShowPlatoon key={index} platoon={platoon} updatePlatoon={updatePlatoon} updateSquad={updateSquad} updateUnit={updateUnit} removeAssigned={removeAssigned}/>))}
     </TableBody>
     </Table>
   )

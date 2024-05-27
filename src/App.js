@@ -8,7 +8,7 @@ import useWebProfile from 'components/useWebProfile';
 import NavBar from 'components/navBar'
 import ShowSpinner from 'components/spinner'
 import ShowAlert from 'components/alert'
-function App() {
+export default function App() {
   const [ webProfile, setWebProfile ] = useWebProfile('webProfile')
   const [ systemTheme, setSystemTheme ] = useState(webProfile?.theme || 'dark');
   const [ spinner, setSpinner ] = useState(false);
@@ -46,5 +46,3 @@ function App() {
     </ThemeProvider>
   );
 }
-
-export default App;

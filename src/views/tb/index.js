@@ -51,6 +51,7 @@ export default function TB(opts = {}){
   },[allyCode])
   useEffect(()=>{
     if(guildId) getGuild()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guildId])
   useEffect(()=>{
     if(guildMembers?.length > 0 && guildMembers?.length === guild?.member?.length) updateGuild()

@@ -14,9 +14,25 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-export default function UpdatePlatoon({ open, setOpen, pDef = [], platoon = {}, changePlatoon}){
+export default function UpdatePlatoon({ open, setOpen, pDef = [], platoon = {}, changePlatoon, removeBonusPlatoon}){
   const handleChange = (event: SelectChangeEvent)=>{
     changePlatoon(false, platoon.id, event.target.value)
+  }
+  if(platoon.bonus){
+    return (
+      <Modal open={open} onClose={()=>setOpen(false)}>
+        <TableContainer sx={style}>
+        <Table>
+          <TableHead>
+            <TableRow><TableCell colSpan="2"><Typography>Remove bonus platoon {platoon.id+' '+platoon.nameKey} </Typography></TableCell></TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow><TableCell><Button variant="contained" onClick={()=>removeBonusPlatoon(platoon.id)}>Remove</Button></TableCell></TableRow>
+          </TableBody>
+        </Table>
+        </TableContainer>
+      </Modal>
+    )
   }
   return (
     <Modal open={open} onClose={()=>setOpen(false)}>

@@ -123,7 +123,8 @@ export default async function checkConflicts(conflicts = [], gp, roundMap, round
 
     for(let i in currentRound){
       if(currentRound[i].star > 0){
-        let tempObj = conflicts.find(x=>x.conflictNum === currentRound[i].conflictNum && x.phaseNum === (currentRound[i].phaseNum + 1))
+        let nextPhase = currentRound[i].phaseNum + 1, conflictNum = currentRound[i].conflictNum
+        let tempObj = conflicts.find(x=>x.conflictNum === conflictNum && x.phaseNum === nextPhase)
         if(tempObj) currentRound[i] = JSON.parse(JSON.stringify(tempObj))
       }
       currentRound[i].round = roundNum

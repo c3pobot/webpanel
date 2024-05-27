@@ -14,7 +14,7 @@ const style = {
 };
 
 
-export default function EditUnit({ open, setOpen, data = {}, changeUnit}){
+export default function EditUnit({ open, setOpen, data = {}, changeUnit, assignUnit}){
   return (
     <Modal open={open} onClose={()=>setOpen(false)}>
       <TableContainer sx={style}>
@@ -25,6 +25,7 @@ export default function EditUnit({ open, setOpen, data = {}, changeUnit}){
         <TableBody>
           <TableRow><TableCell><Button variant="contained" onClick={()=>changeUnit(true, {platoonId: data.platoonId, squadNum: data.squad?.num, baseId: data.unit?.baseId})}>Pre-Filled</Button></TableCell></TableRow>
           <TableRow><TableCell><Button variant="contained" onClick={()=>changeUnit(false, {platoonId: data.platoonId, squadNum: data.squad?.num, baseId: data.unit?.baseId})}>Clear Prefilled</Button></TableCell></TableRow>
+          <TableRow><TableCell><Button variant="contained" onClick={()=>assignUnit(true)}>Assign Unit</Button></TableCell></TableRow>
           <TableRow><TableCell><Button variant="contained" onClick={()=>setOpen(false)}>Cancel</Button></TableCell></TableRow>
         </TableBody>
       </Table>

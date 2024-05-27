@@ -48,6 +48,7 @@ export default function NavBar ({ systemTheme, setSystemTheme, webProfile, setWe
     }
 
     setNavMenuItems(array)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const profileMenuItems = [
     {

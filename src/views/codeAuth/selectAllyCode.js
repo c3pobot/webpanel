@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Button, Table, TableBody, TableCell, TableRow, TextField, Typography } from '@mui/material';
+import { Button, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
 import DB from 'components/db'
 
 export default function SelectAllyCode({opts = {}, setAllyCode}){
-  const { discordId } = opts;
   const [ allyCodes, setAllyCodes ] = useState()
   useEffect(()=>{
     if(!allyCodes) getAllyCodes()

@@ -8,12 +8,11 @@ server {
   index index.html index.htm;
   proxy_set_header Upgrade $http_upgrade;
   proxy_set_header Connection $http_connection;
-  set $api_host $API_SERVICE_URI;
   location /api {
-    proxy_pass $api_host;
+    proxy_pass $API_SERVICE_URI;
   }
   location /socket.io {
-    proxy_pass $api_host;
+    proxy_pass $API_SERVICE_URI;
   }
   location / {
     try_files $uri /index.html;

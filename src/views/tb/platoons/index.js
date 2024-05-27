@@ -8,6 +8,7 @@ import MapPlatoons from './mapPlatoons'
 
 import DaySelector from '../daySelector'
 import ShowPlatoons from './showPlatoons'
+import AddBonusZone from './addBonusZone'
 
 const getRound = (id)=>{
   try{
@@ -27,6 +28,7 @@ export default function Platoons({opts = {}, tb = {}, guild = {}, guildMembers =
   const [ numDays, setNumDays ] = useState(1)
   const [ platoonMap, setPlatoonMap ] = useState([])
   const [ platoonIds, setPlatoonIds ] = useState([])
+  const [ bonusPlatoonAddOpen, openBonusPlatoonAddOpen ] = useState(false)
   useEffect(()=>{
     if(tb.value) GetTBDef()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,6 +139,21 @@ export default function Platoons({opts = {}, tb = {}, guild = {}, guildMembers =
     }
     setSpinner(false)
   }
+  async function updatePlatoonDb(key, data = []){
+    let tempObj = await DB.get(key)
+    if(tempObj?.data){
+      tempObj.data = data
+      await DB.set(key, tempObj)
+    }
+  }
+  async function setBonusZone(tbRound, zoneId){
+    setSpinner(true)
+    openBonusPlatoonAddOpen(false)
+    let tempPlatoonIds = JSON.parse(JSON.stringify(platoonIds))
+    tempPlatoonIds.push({ id: zoneId, bonus: true, squads: [], sort: +(platoonIds.length + 1)})
+    await updatePlatoonDb('tbPlatoonIds-'+tbRound+'-'+tb.value, tempPlatoonIds)
+    setPlatoonIds(tempPlatoonIds)
+  }
   if(!platoons || platoons.length === 0) return (
     <Typography>{"Getting platoon info from the server"}</Typography>
   )
@@ -144,8 +161,10 @@ export default function Platoons({opts = {}, tb = {}, guild = {}, guildMembers =
     <Fragment>
       <Table>
         <TableBody>
+          {bonusPlatoonAddOpen && <AddBonusZone open={bonusPlatoonAddOpen} setOpen={openBonusPlatoonAddOpen} tbDay={tbDay} platoons={platoons?.filter(x=>x.bonus) || [] } setBonusZone={setBonusZone} />}
           <TableRow>
             <TableCell><DaySelector sx={{display: 'inline'}} opts={opts} tbDay={tbDay} setTBDay={setTBDay} numDays={numDays}/></TableCell>
+            <TableCell><Button variant="contained" onClick={()=>openBonusPlatoonAddOpen(true)}>Add Bonus Zone</Button></TableCell>
             {guildMemberLevel > 2 && <TableCell><Button variant="contained" onClick={SaveConfig}>Save</Button></TableCell>}
           </TableRow>
         </TableBody>
