@@ -119,8 +119,8 @@ export default function Platoons({opts = {}, tb = {}, guild = {}, guildMembers =
   }
   async function SaveConfig(){
     setSpinner(true)
-    let data = []
-    for(let i = 0;i< +numDays;i++){
+    let data = [], totalDays = +(numDays || 0) + 1
+    for(let i = 0;i< totalDays;i++){
       let tempObj = await DB.get('tbPlatoonIds-'+i+'-'+tb.value)
       if(tempObj?.id) data.push(tempObj)
     }
@@ -165,8 +165,10 @@ export default function Platoons({opts = {}, tb = {}, guild = {}, guildMembers =
           <TableRow>
             <TableCell><DaySelector sx={{display: 'inline'}} opts={opts} tbDay={tbDay} setTBDay={setTBDay} numDays={numDays}/></TableCell>
             <TableCell><Button variant="contained" onClick={()=>openBonusPlatoonAddOpen(true)}>Add Bonus Zone</Button></TableCell>
-            {guildMemberLevel > 2 && <TableCell><Button variant="contained" onClick={SaveConfig}>Save</Button></TableCell>}
+            <TableCell>{guildMemberLevel > 2 && <Button variant="contained" onClick={SaveConfig}>Save</Button>}</TableCell>
+
           </TableRow>
+          <TableRow><TableCell colSpan="3"><Typography textAlign="center">Because of the the order which the rosters are pulled the bot may assign different players to units when using the discord command. If you want a specfic person to be assigned a unit use the assign unit option.</Typography></TableCell></TableRow>
         </TableBody>
       </Table>
     {platoonMap?.length > 0 && <ShowPlatoons opts={opts} platoonMap={platoonMap} pDef={platoons} platoonIds={platoonIds} tbId={tb.value} setPlatoonIds={setPlatoonIds} tbDay={tbDay} member={guildMembers}/>}
