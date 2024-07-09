@@ -8,6 +8,15 @@ import LinkSuccess from './linkSuccess'
 import ButtonNav from 'components/buttonNav'
 
 export default function Google(opts = {}){
+  return(
+    <Container>
+      <Box textAlign="center" pt={5} pb={5}>
+      <Typography>CG has removed the ability for the bot to do google auth for players.</Typography>
+      <Typography>This page will return if/when they change this.</Typography>
+    </Box>
+    </Container>
+  )
+  /*
   const { discordId } = opts;
   if(!discordId){
     localStorage.setItem('startUrl', window.location.href)
@@ -22,5 +31,5 @@ export default function Google(opts = {}){
   if(navPath === '/errorOccured') return <ErrorOccured {...opts}/>
   if(navPath === '/linkSuccess') return <LinkSuccess {...opts}/>
   return <Link {...opts}/>
-
+  */
 }
