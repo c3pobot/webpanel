@@ -15,7 +15,7 @@ export default function Google(opts = {}){
     <Container>
       <Box textAlign="center" pt={5} pb={5}>
       <Typography>The bots ability to do google auth commands has been removed. please use `/allycode auth ea_connect` until further notice</Typography>
-      <Typography>This page will return if/when they change this.</Typography>
+      <Typography>This page will return if/when this changes.</Typography>
     </Box>
     </Container>
   )
