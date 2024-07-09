@@ -1,3 +1,6 @@
+import React from 'react';
+import { Box, Container, Typography } from '@mui/material';
+
 import Auth from './auth'
 import AllyCodeNoMatch from './allyCodeNoMatch'
 import Code3Error from './code3Error'
@@ -11,7 +14,7 @@ export default function Google(opts = {}){
   return(
     <Container>
       <Box textAlign="center" pt={5} pb={5}>
-      <Typography>CG has removed the ability for the bot to do google auth for players.</Typography>
+      <Typography>The bots ability to do google auth commands has been removed. please use `/allycode auth ea_connect` until further notice</Typography>
       <Typography>This page will return if/when they change this.</Typography>
     </Box>
     </Container>
