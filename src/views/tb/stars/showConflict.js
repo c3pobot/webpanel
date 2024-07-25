@@ -29,6 +29,7 @@ function pointsToNextStar(rewards = [], currentStar, points){
   let neededPoints = 0
   if(currentStar < 3) neededPoints = rewards.find(x=>x.star === currentStar + 1)?.points || 0
   if(neededPoints) neededPoints -= points
+  console.log(neededPoints)
   return neededPoints
 }
 export default function ShowConflict({round = {}, zoneMap = [], setShowSave, updateZoneConfig}){
@@ -97,7 +98,7 @@ export default function ShowConflict({round = {}, zoneMap = [], setShowSave, upd
       {round?.round > 0 && open && <ChangeConflict open={open} setOpen={setOpen} conflicts={zoneMap} conflict={round} updateZoneConfig={updateZoneConfig}/>}
       <TableRow >
         <TableCell sx={conflictSx} colSpan={2}>
-          <Typography onClick={()=>setOpen(true)}>{round.id+' '+round.type+' '+round.nameKey+' '+totalPoints+' '+star+'*'}</Typography>
+          <Typography onClick={()=>setOpen(true)}>{round.id+' '+round.type+' '+round.nameKey+' '+totalPoints?.toLocaleString()+' '+star+'*'}</Typography>
           {pointsToStar > 0 && <Typography>{pointsToStar?.toLocaleString()+' to '+(round.star + 1)+'*'}</Typography>}
         </TableCell>
         <TableCell sx={conflictSx}>

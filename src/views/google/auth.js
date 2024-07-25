@@ -7,8 +7,8 @@ import DB from 'components/db'
 import queryString from 'query-string';
 
 export default function Auth (opts = {}) {
-  ButtonNav('/discord/login')
-  /*
+  //ButtonNav('/discord/login')
+  
   const { discordId, setSpinner } = opts;
   useEffect (()=>{
     async function CheckAuth(){
@@ -35,7 +35,7 @@ export default function Auth (opts = {}) {
     CheckAuth()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  */
+  
   return (
     <Container>
       <Box textAlign="center" pt={5} pb={5}>
